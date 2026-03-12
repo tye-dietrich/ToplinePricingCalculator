@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Topline Pricing Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #F5C400;
+    --black: #0A0A0A;
+    --dark: #111111;
+    --panel: #1A1A1A;
+    --border: #2A2A2A;
+    --mid: #333333;
+    --text: #E8E8E8;
+    --muted: #888888;
+    --red: #E53935;
+    --green: #00C853;
+    --blue: #1565C0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--black);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ---- HEADER ---- */
+  header {
+    background: var(--yellow);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    border-bottom: 4px solid var(--black);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-diamond {
+    width: 40px;
+    height: 40px;
+    background: var(--black);
+    transform: rotate(45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .logo-diamond span {
+    transform: rotate(-45deg);
+    color: var(--yellow);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 13px;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    color: var(--black);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .logo-sub {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--black);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .header-badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--black);
+    background: rgba(0,0,0,0.15);
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+
+  /* ---- BANNER ---- */
+  .banner {
+    background: var(--red);
+    padding: 10px 32px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .banner-dot { width: 8px; height: 8px; background: white; border-radius: 50%; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ---- LAYOUT ---- */
+  .app {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 0;
+    min-height: calc(100vh - 104px);
+  }
+
+  .left-col {
+    border-right: 2px solid var(--border);
+    overflow-y: auto;
+  }
+
+  .right-col {
+    background: var(--dark);
+    position: sticky;
+    top: 0;
+    height: calc(100vh - 104px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---- SECTIONS ---- */
+  .section {
+    border-bottom: 2px solid var(--border);
+  }
+
+  .section-header {
+    padding: 16px 24px;
+    background: var(--panel);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  .section-header:hover { background: var(--mid); }
+
+  .section-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 14px;
+    color: var(--yellow);
+    letter-spacing: 2px;
+    background: rgba(245,196,0,0.1);
+    border: 1px solid rgba(245,196,0,0.3);
+    padding: 3px 9px;
+    min-width: 36px;
+    text-align: center;
+  }
+
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    flex: 1;
+  }
+
+  .section-chevron {
+    color: var(--muted);
+    font-size: 12px;
+    transition: transform 0.2s;
+  }
+
+  .section-body {
+    padding: 0 24px 20px;
+  }
+
+  /* ---- TABLE ---- */
+  .price-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+  }
+
+  .price-table th {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 10px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .price-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+    vertical-align: middle;
+  }
+
+  .price-table tr:last-child td { border-bottom: none; }
+  .price-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .service-name {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text);
+  }
+
+  .unit-label {
+    color: var(--muted);
+    font-size: 13px;
+    font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 0.5px;
+  }
+
+  /* ---- RATE INPUT ---- */
+  .rate-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .dollar-sign {
+    color: var(--muted);
+    font-size: 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+  }
+
+  input[type="number"].rate-input {
+    background: var(--black);
+    border: 1px solid var(--border);
+    color: var(--yellow);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    width: 90px;
+    padding: 5px 8px;
+    outline: none;
+    transition: border-color 0.15s;
+    -moz-appearance: textfield;
+  }
+
+  input[type="number"].rate-input::-webkit-outer-spin-button,
+  input[type="number"].rate-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  input[type="number"].rate-input:focus {
+    border-color: var(--yellow);
+    background: rgba(245,196,0,0.05);
+  }
+
+  input[type="number"].rate-input::placeholder { color: var(--border); }
+  input[type="number"].rate-input.has-value { color: var(--yellow); }
+
+  /* ---- QTY INPUT ---- */
+  input[type="number"].qty-input {
+    background: var(--black);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    width: 70px;
+    padding: 5px 8px;
+    outline: none;
+    transition: border-color 0.15s;
+    -moz-appearance: textfield;
+  }
+
+  input[type="number"].qty-input::-webkit-outer-spin-button,
+  input[type="number"].qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  input[type="number"].qty-input:focus { border-color: var(--yellow); }
+
+  /* ---- LINE TOTAL ---- */
+  .line-total {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--muted);
+    min-width: 80px;
+    text-align: right;
+  }
+
+  .line-total.has-value { color: var(--green); }
+
+  /* ---- NOTE ---- */
+  .note-tag {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* ---- RIGHT PANEL ---- */
+  .panel-header {
+    background: var(--yellow);
+    padding: 16px 20px;
+    color: var(--black);
+  }
+
+  .panel-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .panel-sub {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.65;
+    margin-top: 2px;
+  }
+
+  .panel-body { padding: 20px; flex: 1; overflow-y: auto; }
+
+  /* ---- SUMMARY LINES ---- */
+  .summary-section {
+    margin-bottom: 20px;
+  }
+
+  .summary-section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+  }
+
+  .summary-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 4px 0;
+    font-size: 13px;
+  }
+
+  .summary-line-name { color: var(--text); flex: 1; }
+  .summary-line-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--green);
+  }
+
+  .empty-msg {
+    color: var(--muted);
+    font-size: 12px;
+    font-style: italic;
+    padding: 4px 0;
+  }
+
+  /* ---- TOTALS ---- */
+  .totals-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 16px;
+    margin-top: 8px;
+  }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .total-row:last-child { border-bottom: none; }
+
+  .total-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .total-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text);
+  }
+
+  .total-row.grand .total-label {
+    font-size: 15px;
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .total-row.grand .total-val {
+    font-size: 22px;
+    color: var(--yellow);
+  }
+
+  /* ---- MOBILIZATION ---- */
+  .mob-section {
+    padding: 16px 20px;
+    border-top: 2px solid var(--border);
+  }
+
+  .mob-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .mob-select {
+    width: 100%;
+    background: var(--black);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    padding: 7px 10px;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  .mob-select:focus { border-color: var(--yellow); }
+
+  /* ---- MARKUP ---- */
+  .markup-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .markup-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    flex: 1;
+  }
+
+  input[type="number"].markup-input {
+    background: var(--black);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    width: 60px;
+    padding: 5px 8px;
+    outline: none;
+    -moz-appearance: textfield;
+    text-align: center;
+  }
+
+  input[type="number"].markup-input::-webkit-outer-spin-button,
+  input[type="number"].markup-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  input[type="number"].markup-input:focus { border-color: var(--yellow); }
+
+  /* ---- ACTIONS ---- */
+  .actions { padding: 16px 20px; border-top: 2px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+
+  .btn {
+    width: 100%;
+    padding: 11px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+
+  .btn-primary { background: var(--yellow); color: var(--black); }
+  .btn-primary:hover { background: #ffd000; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
+
+  /* ---- MODAL ---- */
+  .modal-overlay {
+    display: none;
+    position: fixed; top:0; left:0; right:0; bottom:0;
+    background: rgba(0,0,0,0.85);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--dark);
+    border: 2px solid var(--yellow);
+    width: 580px;
+    max-width: 95vw;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    background: var(--yellow);
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modal-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: var(--black);
+    cursor: pointer;
+    font-weight: 900;
+    padding: 0 4px;
+  }
+
+  .modal-body { padding: 24px 20px; }
+
+  .quote-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .quote-line:last-child { border-bottom: none; }
+
+  .quote-total-box {
+    background: var(--panel);
+    margin-top: 16px;
+    padding: 16px;
+  }
+
+  .quote-grand {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 24px;
+    color: var(--yellow);
+  }
+
+  /* ---- PRINT ---- */
+  @media print {
+    .right-col, .banner, .actions, .modal-overlay, .btn { display: none !important; }
+    .app { grid-template-columns: 1fr; }
+    body { background: white; color: black; }
+    .section-header { background: #eee; }
+    input { border: 1px solid #ccc; }
+  }
+
+  /* ---- SCROLLBAR ---- */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: var(--mid); }
+</style>
+</head>
+<body>
+<div id="splash" style="position:fixed;inset:0;z-index:9999;background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;">
+  <img src="data:image/webp;base64,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" style="width:220px;max-width:80vw;animation:splashPop 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;" alt="Topline Logo">
+  <div style="width:260px;max-width:70vw;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:10px;">Loading Calculator</div>
+    <div style="background:#222;border:1px solid #333;height:6px;border-radius:3px;overflow:hidden;">
+      <div id="splashBar" style="height:100%;width:0%;background:linear-gradient(90deg,#f5c400,#ffdd55);border-radius:3px;"></div>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes splashPop {
+  0%{opacity:0;transform:scale(0.7);}
+  100%{opacity:1;transform:scale(1);}
+}
+@keyframes splashFade {
+  0%{opacity:1;}
+  100%{opacity:0;pointer-events:none;}
+}
+</style>
+<script>
+(function(){
+  var pct = 0;
+  var bar = document.getElementById("splashBar");
+  var splash = document.getElementById("splash");
+  bar.style.transition = "width 0.05s linear";
+  var iv = setInterval(function(){
+    pct += (pct < 70 ? 2.2 : pct < 90 ? 0.8 : 0.3);
+    if(pct >= 100){
+      pct = 100;
+      bar.style.width = "100%";
+      clearInterval(iv);
+      setTimeout(function(){
+        splash.style.animation = "splashFade 0.5s ease forwards";
+        setTimeout(function(){ splash.style.display="none"; }, 500);
+      }, 280);
+    } else {
+      bar.style.width = pct + "%";
+    }
+  }, 30);
+})();
+</script>
+
+<header>
+  <div class="logo">
+    <div class="logo-diamond"><span>TPS</span></div>
+    <div>
+      <div class="logo-text">Topline Pavement Services</div>
+      <div class="logo-sub">Est. 1985 · Southern Ontario</div>
+    </div>
+  </div>
+  <div class="header-badge">Pricing Calculator — Internal Use</div>
+</header>
+
+<div class="banner">
+  <div class="banner-dot"></div>
+  ⚠ Rate fields are placeholders — Emily, Maureen, or Dave: if you know the set price for any item, enter it directly into the rate field. Pull from OS 1.0 or Jobber. Target: March 31, 2026
+</div>
+
+<div class="app">
+  <!-- LEFT COLUMN: SERVICE TABLES -->
+  <div class="left-col" id="servicesCol">
+
+    <!-- LINE PAINTING -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <span class="section-num">01</span>
+        <span class="section-title">Line Painting</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <table class="price-table">
+          <thead><tr>
+            <th style="width:36%">Service</th>
+            <th style="width:14%">Unit</th>
+            <th style="width:18%">Base Rate</th>
+            <th style="width:14%">Qty</th>
+            <th style="width:18%">Line Total</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="service-name">Standard stall (new layout)</div></td>
+              <td><span class="unit-label">per stall</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Standard stall (re-stripe)</div></td>
+              <td><span class="unit-label">per stall</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Handicap stall (AODA symbol)<br><span class="note-tag">Parking lot accessibility — not playground</span></div></td>
+              <td><span class="unit-label">per stall</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Directional arrows</div></td>
+              <td><span class="unit-label">per arrow</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Stop bars</div></td>
+              <td><span class="unit-label">per lin. ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Crosswalk</div></td>
+              <td><span class="unit-label">per lin. ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Fire lane</div></td>
+              <td><span class="unit-label">per lin. ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Curb painting</div></td>
+              <td><span class="unit-label">per lin. ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Full lot layout (new)<br><span class="note-tag">Min mobilization applies</span></div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.001" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- ACCESSIBILITY & PARKING STENCILS -->
+        <div style="font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--muted); padding: 16px 0 8px; border-bottom:1px solid var(--border);">♿ Accessibility &amp; Parking Stencils</div>
+        <table class="price-table">
+          <thead><tr>
+            <th style="width:36%">Stencil</th>
+            <th style="width:14%">Unit</th>
+            <th style="width:18%">Base Rate</th>
+            <th style="width:14%">Qty</th>
+            <th style="width:18%">Line Total</th>
+          </tr></thead>
+          <tbody>
+            <tr><td><div class="service-name">Accessibility Parking</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">No Parking Symbol</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Electric Vehicle Symbol (EV)</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Go Fast Accessibility Parking</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Arrow Head</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Arrow Body Straight</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Arrow Body Curved (Left)</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Arrow Body Curved (Right)</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Arrow</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Visitors</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Reserved</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">No Parking</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">"V" Visitor</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Numbers (Topline)</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Straight Boards</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SEALCOATING -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <span class="section-num">02</span>
+        <span class="section-title">Sealcoating</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <table class="price-table">
+          <thead><tr>
+            <th style="width:36%">Service</th>
+            <th style="width:14%">Unit</th>
+            <th style="width:18%">Base Rate</th>
+            <th style="width:14%">Qty</th>
+            <th style="width:18%">Line Total</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="service-name">Sealcoat (standard)<br><span class="note-tag">2-coat application</span></div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.001" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Sealcoat (premium mix)</div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.001" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Sealcoat — large lot (10,000+ sq ft)<br><span class="note-tag">Volume discount</span></div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.001" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Sealcoat — small lot (&lt;3,000 sq ft)<br><span class="note-tag">Min charge</span></div></td>
+              <td><span class="unit-label">flat</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CRACK FILLING -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <span class="section-num">03</span>
+        <span class="section-title">Crack Filling</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <table class="price-table">
+          <thead><tr>
+            <th style="width:36%">Service</th>
+            <th style="width:14%">Unit</th>
+            <th style="width:18%">Base Rate</th>
+            <th style="width:14%">Qty</th>
+            <th style="width:18%">Line Total</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="service-name">Crack fill (standard)</div></td>
+              <td><span class="unit-label">per lin. ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Crack fill (wide / spalled)</div></td>
+              <td><span class="unit-label">per lin. ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Crack fill + seal combo</div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.001" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- POTHOLE / INFRARED -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <span class="section-num">04</span>
+        <span class="section-title">Pothole & Infrared Repair</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <table class="price-table">
+          <thead><tr>
+            <th style="width:36%">Service</th>
+            <th style="width:14%">Unit</th>
+            <th style="width:18%">Base Rate</th>
+            <th style="width:14%">Qty</th>
+            <th style="width:18%">Line Total</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="service-name">Infrared repair (small, &lt;1 sq ft)</div></td>
+              <td><span class="unit-label">flat</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Infrared repair (medium, 1–5 sq ft)</div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Infrared repair (large, 5+ sq ft)</div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Cold patch (temporary)<br><span class="note-tag">Emergency only</span></div></td>
+              <td><span class="unit-label">flat</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Full remove &amp; replace<br><span class="note-tag">Subcontractor + margin</span></div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PARKING LOT — LINE PAINTING EXTRAS (AODA) -->
+    <!-- AODA moved to parking lot section — handled in section 01 above -->
+
+    <!-- PLAYGROUND — STENCIL ADD-ONS -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <span class="section-num">05B</span>
+        <span class="section-title">Playground — Stencil &amp; Module Add-Ons</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div style="margin-top:14px; margin-bottom:4px; background:rgba(245,196,0,0.06); border-left:3px solid var(--yellow); padding:10px 12px;">
+          <div style="font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--yellow); margin-bottom:4px;">Stencil Catalogue — Per Stencil Pricing</div>
+          <div style="font-size:12px; color:var(--muted);">Individual stencil add-ons for standalone jobs or Atlas package upgrades. All rates TBD — Mike / Maureen to populate from Jobber.</div>
+        </div>
+
+        <!-- HOPSCOTCH STENCILS -->
+        <div style="font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--muted); padding: 16px 0 8px; border-bottom:1px solid var(--border);">🪀 Hopscotch Stencils</div>
+        <table class="price-table">
+          <thead><tr><th style="width:36%">Stencil</th><th style="width:14%">Unit</th><th style="width:18%">Base Rate</th><th style="width:14%">Qty</th><th style="width:18%">Line Total</th></tr></thead>
+          <tbody>
+            <tr><td><div class="service-name">Hopscotch (Standard)</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Snail Hopscotch</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+          </tbody>
+        </table>
+
+        <!-- TRIKE TRACK / TRAFFIC STENCILS -->
+        <div style="font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--muted); padding: 16px 0 8px; border-bottom:1px solid var(--border);">🚲 Trike Track / Traffic Stencils</div>
+        <table class="price-table">
+          <thead><tr><th style="width:36%">Stencil</th><th style="width:14%">Unit</th><th style="width:18%">Base Rate</th><th style="width:14%">Qty</th><th style="width:18%">Line Total</th></tr></thead>
+          <tbody>
+            <tr><td><div class="service-name">Yield Sign</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Speed Limit 5</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Stop Sign</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Bicycle Symbol</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Turn Arrow</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Crosswalk</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Traffic Light</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+          </tbody>
+        </table>
+
+        <!-- SNAKES & LADDERS STENCILS -->
+        <div style="font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--muted); padding: 16px 0 8px; border-bottom:1px solid var(--border);">🎲 Snakes &amp; Ladders Stencils</div>
+        <table class="price-table">
+          <thead><tr><th style="width:36%">Stencil</th><th style="width:14%">Unit</th><th style="width:18%">Base Rate</th><th style="width:14%">Qty</th><th style="width:18%">Line Total</th></tr></thead>
+          <tbody>
+            <tr><td><div class="service-name">100 Square (Snakes &amp; Ladders)</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">1-81 Snakes &amp; Ladders</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Ladder (Small)</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Ladder (Medium)</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Ladder (Large)</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Snake (Small)</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Snake (Medium)</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Snake (Large)</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+          </tbody>
+        </table>
+
+        <!-- SENSORY TRACK STENCILS -->
+        <div style="font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--muted); padding: 16px 0 8px; border-bottom:1px solid var(--border);">🌿 Sensory Track Stencils</div>
+        <table class="price-table">
+          <thead><tr><th style="width:36%">Stencil</th><th style="width:14%">Unit</th><th style="width:18%">Base Rate</th><th style="width:14%">Qty</th><th style="width:18%">Line Total</th></tr></thead>
+          <tbody>
+            <tr><td><div class="service-name">Pop the Bubbles</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Frog Jump</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Frog Jump Background</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Mirror Me</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Star Trail</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+          </tbody>
+        </table>
+
+        <!-- AGILITY TRACK SHAPES -->
+        <div style="font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--muted); padding: 16px 0 8px; border-bottom:1px solid var(--border);">🔷 Agility Track Shapes</div>
+        <table class="price-table">
+          <thead><tr><th style="width:36%">Stencil</th><th style="width:14%">Unit</th><th style="width:18%">Base Rate</th><th style="width:14%">Qty</th><th style="width:18%">Line Total</th></tr></thead>
+          <tbody>
+            <tr><td><div class="service-name">Feet Stencil</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Bear / Animal Paw Stencil</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">A-Z Letter Stencils</div></td><td><span class="unit-label">per set</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Rectangle Stencils</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Small Circles</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Medium Circles</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Large Circles</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Large Triangles</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Small Triangles</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Hexagon</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Squares</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+          </tbody>
+        </table>
+
+        <!-- MISCELLANEOUS -->
+        <div style="font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--muted); padding: 16px 0 8px; border-bottom:1px solid var(--border);">📦 Miscellaneous Stencils</div>
+        <table class="price-table">
+          <thead><tr><th style="width:36%">Stencil</th><th style="width:14%">Unit</th><th style="width:18%">Base Rate</th><th style="width:14%">Qty</th><th style="width:18%">Line Total</th></tr></thead>
+          <tbody>
+            <tr><td><div class="service-name">Alphabet Tree</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Alphabet Dragon (Large)</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Caterpillar Head</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Clock</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Shuffleboard</div></td><td><span class="unit-label">per stencil</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Uppercase Playground Alphabet (8×5)</div></td><td><span class="unit-label">per set</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Uppercase Playground Alphabet (alt font)</div></td><td><span class="unit-label">per set</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">Lowercase Playground Alphabet</div></td><td><span class="unit-label">per set</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+            <tr><td><div class="service-name">0-9 Playground Numbers</div></td><td><span class="unit-label">per set</span></td><td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td><td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td><td><span class="line-total">—</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- THERMOPLASTIC -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <span class="section-num">06</span>
+        <span class="section-title">Thermoplastic Markings</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <table class="price-table">
+          <thead><tr>
+            <th style="width:36%">Service</th>
+            <th style="width:14%">Unit</th>
+            <th style="width:18%">Base Rate</th>
+            <th style="width:14%">Qty</th>
+            <th style="width:18%">Line Total</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="service-name">Thermoplastic symbol / marking<br><span class="note-tag">Premium tier — track material cost</span></div></td>
+              <td><span class="unit-label">per symbol</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Thermoplastic removal<br><span class="note-tag">Before re-application</span></div></td>
+              <td><span class="unit-label">per symbol</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">MMA intersection / crosswalk<br><span class="note-tag">High-durability formula</span></div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DIVIDER: INDOOR SERVICES -->
+    <div style="background: rgba(245,196,0,0.08); border-top: 2px solid var(--yellow); border-bottom: 2px solid var(--yellow); padding: 10px 24px; display:flex; align-items:center; gap:12px;">
+      <span style="font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--yellow);">▼ Indoor / Warehouse Services</span>
+      <span style="font-size:11px; color:var(--muted);">Year-round · Site-specific quotes</span>
+    </div>
+
+    <!-- WAREHOUSE LINE MARKING -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <span class="section-num">07</span>
+        <span class="section-title">Warehouse Line Marking</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <table class="price-table">
+          <thead><tr>
+            <th style="width:36%">Service</th>
+            <th style="width:14%">Unit</th>
+            <th style="width:18%">Base Rate</th>
+            <th style="width:14%">Qty</th>
+            <th style="width:18%">Line Total</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="service-name">Aisle lines (new layout)</div></td>
+              <td><span class="unit-label">per lin. ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Aisle lines (re-stripe)</div></td>
+              <td><span class="unit-label">per lin. ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Safety zone / hazard marking</div></td>
+              <td><span class="unit-label">per lin. ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Loading dock markings</div></td>
+              <td><span class="unit-label">per dock</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Forklift / pedestrian separation zone</div></td>
+              <td><span class="unit-label">per lin. ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Full floor layout (new)<br><span class="note-tag">Site-specific — quote per job</span></div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.001" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INDOOR SEALCOATING -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <span class="section-num">07B</span>
+        <span class="section-title">Sealcoating — Indoor / Warehouse</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <table class="price-table">
+          <thead><tr>
+            <th style="width:36%">Service</th>
+            <th style="width:14%">Unit</th>
+            <th style="width:18%">Base Rate</th>
+            <th style="width:14%">Qty</th>
+            <th style="width:18%">Line Total</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="service-name">Sealcoat — indoor standard<br><span class="note-tag">Concrete / warehouse floor application</span></div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.001" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Sealcoat — indoor premium (2-coat)<br><span class="note-tag">High-traffic zones</span></div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.001" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Sealcoat — large floor (10,000+ sq ft)<br><span class="note-tag">Volume discount applies</span></div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.001" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Surface prep / clean<br><span class="note-tag">Required before indoor seal application</span></div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.001" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MIGHTY LINE TAPE -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <span class="section-num">08</span>
+        <span class="section-title">Mighty Line Floor Tape</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <table class="price-table">
+          <thead><tr>
+            <th style="width:36%">Service</th>
+            <th style="width:14%">Unit</th>
+            <th style="width:18%">Base Rate</th>
+            <th style="width:14%">Qty</th>
+            <th style="width:18%">Line Total</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="service-name">Mighty Line tape — supply &amp; install<br><span class="note-tag">Removable / repositionable</span></div></td>
+              <td><span class="unit-label">per lin. ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Mighty Line tape — corners &amp; T's<br><span class="note-tag">Pre-formed fittings</span></div></td>
+              <td><span class="unit-label">per piece</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Tape removal (old tape / adhesive)<br><span class="note-tag">Before re-install</span></div></td>
+              <td><span class="unit-label">per lin. ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- EPOXY FLOORING -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <span class="section-num">09</span>
+        <span class="section-title">Epoxy Flooring</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <table class="price-table">
+          <thead><tr>
+            <th style="width:36%">Service</th>
+            <th style="width:14%">Unit</th>
+            <th style="width:18%">Base Rate</th>
+            <th style="width:14%">Qty</th>
+            <th style="width:18%">Line Total</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="service-name">Epoxy coating — standard (1-coat)</div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Epoxy coating — premium (2-coat)</div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Floor prep / grind<br><span class="note-tag">Required before epoxy application</span></div></td>
+              <td><span class="unit-label">per sq ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Line marking on epoxy<br><span class="note-tag">Applied after epoxy cure</span></div></td>
+              <td><span class="unit-label">per lin. ft</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SIGNS, CONES & TRAFFIC -->
+    <!-- NO PARKING SIGNS -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <span class="section-num">10</span>
+        <span class="section-title">Signs, Cones &amp; Traffic Control</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <table class="price-table">
+          <thead><tr>
+            <th style="width:36%">Service</th>
+            <th style="width:14%">Unit</th>
+            <th style="width:18%">Base Rate</th>
+            <th style="width:14%">Qty</th>
+            <th style="width:18%">Line Total</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="service-name">No Parking signs (placed + retrieved)</div></td>
+              <td><span class="unit-label">per sign</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="0.01" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Cone setup (large lot)</div></td>
+              <td><span class="unit-label">flat</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+            <tr>
+              <td><div class="service-name">Traffic control (flagging)<br><span class="note-tag">Subcontract rate</span></div></td>
+              <td><span class="unit-label">per hour</span></td>
+              <td><div class="rate-input-wrap"><span class="dollar-sign">$</span><input type="number" class="rate-input" placeholder="0.00" min="0" step="1" oninput="calc(this)"></div></td>
+              <td><input type="number" class="qty-input" placeholder="0" min="0" oninput="calc(this)"></td>
+              <td><span class="line-total">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- end left-col -->
+
+  <!-- RIGHT COLUMN: SUMMARY -->
+  <div class="right-col">
+    <div class="panel-header">
+      <div class="panel-title">Quote Summary</div>
+      <div class="panel-sub">All prices CAD · HST not included</div>
+    </div>
+
+    <div class="panel-body">
+      <div id="summaryContainer">
+        <div class="empty-msg">Enter quantities above to build your quote.</div>
+      </div>
+
+      <div class="totals-box" id="totalsBox" style="display:none">
+        <div class="total-row">
+          <span class="total-label">Services Subtotal</span>
+          <span class="total-val" id="subtotalVal">$0.00</span>
+        </div>
+        <div class="total-row" id="markupRow" style="display:none">
+          <span class="total-label">Site Complexity (<span id="markupPctLabel">0</span>%)</span>
+          <span class="total-val" id="markupVal">$0.00</span>
+        </div>
+        <div class="total-row" id="mobRow" style="display:none">
+          <span class="total-label">Mobilization</span>
+          <span class="total-val" id="mobVal">$0.00</span>
+        </div>
+        <div class="total-row" id="discountRow" style="display:none; color:#4caf72;">
+          <span class="total-label" id="discountRowLabel" style="color:#4caf72;">Discount</span>
+          <span class="total-val" id="discountVal" style="color:#4caf72;">−$0.00</span>
+        </div>
+        <div class="total-row">
+          <span class="total-label">HST (13%)</span>
+          <span class="total-val" id="hstVal">$0.00</span>
+        </div>
+        <div class="total-row grand">
+          <span class="total-label">TOTAL</span>
+          <span class="total-val" id="grandVal">$0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOBILIZATION -->
+    <div class="mob-section">
+      <div class="mob-label">Mobilization</div>
+      <select class="mob-select" id="mobSelect" onchange="updateTotals()">
+        <option value="0">None / Already included</option>
+        <option value="-1">Local (under 30 min) — enter rate below</option>
+        <option value="-2">Regional (30–60 min) — enter rate below</option>
+        <option value="-3">Extended (60+ min) — enter rate below</option>
+      </select>
+      <div class="markup-row" id="mobRateRow" style="display:none">
+        <span class="markup-label">Mob. rate ($)</span>
+        <span class="dollar-sign">$</span>
+        <input type="number" class="markup-input" id="mobRateInput" value="0" min="0" step="1" style="width:80px" oninput="updateTotals()">
+      </div>
+
+      <div class="markup-row">
+        <span class="markup-label">Site complexity markup</span>
+        <input type="number" class="markup-input" id="markupInput" value="0" min="0" max="50" step="5">
+        <span style="color:var(--muted); font-size:13px;">%</span>
+      </div>
+      <div style="font-size:11px; color:var(--muted); margin-top:4px;">0% standard · 10–15% for difficult access</div>
+    </div>
+
+    <!-- DISCOUNT -->
+    <div class="mob-section" style="border-top:1px dashed var(--border); margin-top:0;">
+      <div class="mob-label" style="color:var(--yellow);">Client Discount (Optional)</div>
+      <div class="markup-row" style="margin-top:8px;">
+        <span class="markup-label">Discount type</span>
+        <select class="mob-select" id="discountType" onchange="updateTotals()" style="flex:1; font-size:13px; padding:5px 8px;">
+          <option value="none">None</option>
+          <option value="pct">Percentage off (%)</option>
+          <option value="flat">Flat amount off ($)</option>
+        </select>
+      </div>
+      <div class="markup-row" id="discountValRow" style="display:none; margin-top:6px;">
+        <span class="markup-label" id="discountValLabel">Discount value</span>
+        <span class="dollar-sign" id="discountDollarSign" style="display:none">$</span>
+        <input type="number" class="markup-input" id="discountInput" value="0" min="0" step="1" style="width:80px" oninput="updateTotals()">
+        <span id="discountPctSign" style="color:var(--muted); font-size:13px;">%</span>
+      </div>
+      <div style="font-size:11px; color:var(--muted); margin-top:4px;">Applied before HST · Requires approval before use</div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+      <button class="btn btn-primary" onclick="openQuote()">▶ Generate Quote</button>
+      <button class="btn btn-ghost" onclick="clearAll()">✕ Clear All</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUOTE MODAL -->
+<div class="modal-overlay" id="quoteModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">📋 Quote Preview</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="quoteBody"></div>
+  </div>
+</div>
+
+<script>
+  // --- Section toggle ---
+  function toggleSection(header) {
+    const body = header.nextElementSibling;
+    const chevron = header.querySelector('.section-chevron');
+    const open = body.style.display !== 'none';
+    body.style.display = open ? 'none' : 'block';
+    chevron.style.transform = open ? 'rotate(-90deg)' : 'rotate(0deg)';
+  }
+
+  // --- Calc line total when rate or qty changes ---
+  function calc(input) {
+    const row = input.closest('tr');
+    const rateInput = row.querySelector('.rate-input');
+    const qtyInput = row.querySelector('.qty-input');
+    const totalEl = row.querySelector('.line-total');
+    const rate = parseFloat(rateInput.value) || 0;
+    const qty = parseFloat(qtyInput.value) || 0;
+    const total = rate * qty;
+
+    if (rate > 0 && qty > 0) {
+      totalEl.textContent = '$' + total.toLocaleString('en-CA', {minimumFractionDigits:2, maximumFractionDigits:2});
+      totalEl.classList.add('has-value');
+    } else {
+      totalEl.textContent = '—';
+      totalEl.classList.remove('has-value');
+    }
+
+    // mark rate field
+    rateInput.classList.toggle('has-value', rate > 0);
+
+    updateTotals();
+  }
+
+  // --- Gather all line items ---
+  function getLineItems() {
+    const items = [];
+    document.querySelectorAll('.price-table tbody tr').forEach(row => {
+      const name = row.querySelector('.service-name')?.childNodes[0]?.textContent?.trim();
+      const rate = parseFloat(row.querySelector('.rate-input')?.value) || 0;
+      const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
+      const unit = row.querySelector('.unit-label')?.textContent?.trim();
+      if (rate > 0 && qty > 0) {
+        items.push({ name, rate, qty, unit, total: rate * qty });
+      }
+    });
+    return items;
+  }
+
+  // --- Get section name for a row ---
+  function getSectionForRow(row) {
+    const section = row.closest('.section');
+    return section?.querySelector('.section-title')?.textContent || 'Other';
+  }
+
+  // --- Update right panel summary ---
+  function updateTotals() {
+    const items = getLineItems();
+    const markup = parseFloat(document.getElementById('markupInput').value) || 0;
+
+    // Mob
+    const mobSel = document.getElementById('mobSelect').value;
+    const mobRateRow = document.getElementById('mobRateRow');
+    let mobAmount = 0;
+    if (mobSel !== '0') {
+      mobRateRow.style.display = 'flex';
+      mobAmount = parseFloat(document.getElementById('mobRateInput').value) || 0;
+    } else {
+      mobRateRow.style.display = 'none';
+    }
+
+    // Discount
+    const discountType = document.getElementById('discountType').value;
+    const discountValRow = document.getElementById('discountValRow');
+    const discountDollarSign = document.getElementById('discountDollarSign');
+    const discountPctSign = document.getElementById('discountPctSign');
+    let discountAmount = 0;
+    if (discountType !== 'none') {
+      discountValRow.style.display = 'flex';
+      const discountInput = parseFloat(document.getElementById('discountInput').value) || 0;
+      if (discountType === 'pct') {
+        discountDollarSign.style.display = 'none';
+        discountPctSign.style.display = 'inline';
+        const base = items.reduce((s, i) => s + i.total, 0) + mobAmount;
+        discountAmount = base * (discountInput / 100);
+        document.getElementById('discountRowLabel').textContent = `Discount (${discountInput}%)`;
+      } else {
+        discountDollarSign.style.display = 'inline';
+        discountPctSign.style.display = 'none';
+        discountAmount = discountInput;
+        document.getElementById('discountRowLabel').textContent = 'Discount (Flat)';
+      }
+    } else {
+      discountValRow.style.display = 'none';
+    }
+
+    document.getElementById('markupPctLabel').textContent = markup;
+
+    const container = document.getElementById('summaryContainer');
+    const totalsBox = document.getElementById('totalsBox');
+
+    if (items.length === 0 && mobAmount === 0) {
+      container.innerHTML = '<div class="empty-msg">Enter quantities above to build your quote.</div>';
+      totalsBox.style.display = 'none';
+      return;
+    }
+
+    // Group by section
+    const bySection = {};
+    document.querySelectorAll('.price-table tbody tr').forEach(row => {
+      const name = row.querySelector('.service-name')?.childNodes[0]?.textContent?.trim();
+      const rate = parseFloat(row.querySelector('.rate-input')?.value) || 0;
+      const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
+      if (rate > 0 && qty > 0) {
+        const sec = getSectionForRow(row);
+        if (!bySection[sec]) bySection[sec] = [];
+        bySection[sec].push({ name, total: rate * qty });
+      }
+    });
+
+    let html = '';
+    for (const [sec, rows] of Object.entries(bySection)) {
+      html += `<div class="summary-section">
+        <div class="summary-section-title">${sec}</div>`;
+      rows.forEach(r => {
+        html += `<div class="summary-line">
+          <span class="summary-line-name">${r.name}</span>
+          <span class="summary-line-val">$${r.total.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+        </div>`;
+      });
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+    totalsBox.style.display = 'block';
+
+    const subtotal = items.reduce((s, i) => s + i.total, 0);
+    const markupAmt = subtotal * (markup / 100);
+    const beforeDiscount = subtotal + markupAmt + mobAmount;
+    const beforeHST = Math.max(0, beforeDiscount - discountAmount);
+    const hst = beforeHST * 0.13;
+    const grand = beforeHST + hst;
+
+    document.getElementById('subtotalVal').textContent = '$' + subtotal.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById('markupVal').textContent = '$' + markupAmt.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById('hstVal').textContent = '$' + hst.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById('grandVal').textContent = '$' + grand.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById('mobVal').textContent = '$' + mobAmount.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById('discountVal').textContent = '−$' + discountAmount.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+    document.getElementById('markupRow').style.display = markup > 0 ? 'flex' : 'none';
+    document.getElementById('mobRow').style.display = mobAmount > 0 ? 'flex' : 'none';
+    document.getElementById('discountRow').style.display = discountAmount > 0 ? 'flex' : 'none';
+  }
+
+  // Also update when markup input changes
+  document.getElementById('markupInput').addEventListener('input', updateTotals);
+
+  // --- Quote modal ---
+  function openQuote() {
+    const items = getLineItems();
+    const markup = parseFloat(document.getElementById('markupInput').value) || 0;
+    const mobSel = document.getElementById('mobSelect').value;
+    const mobAmount = mobSel !== '0' ? (parseFloat(document.getElementById('mobRateInput').value) || 0) : 0;
+
+    // Discount
+    const discountType = document.getElementById('discountType').value;
+    let discountAmount = 0;
+    let discountLabel = '';
+    if (discountType !== 'none') {
+      const discountInput = parseFloat(document.getElementById('discountInput').value) || 0;
+      if (discountType === 'pct') {
+        const base = items.reduce((s, i) => s + i.total, 0) + mobAmount;
+        discountAmount = base * (discountInput / 100);
+        discountLabel = `Client Discount (${discountInput}%)`;
+      } else {
+        discountAmount = discountInput;
+        discountLabel = 'Client Discount (Flat)';
+      }
+    }
+
+    if (items.length === 0 && mobAmount === 0) {
+      alert('Add at least one service with a rate and quantity first.');
+      return;
+    }
+
+    const subtotal = items.reduce((s, i) => s + i.total, 0);
+    const markupAmt = subtotal * (markup / 100);
+    const beforeDiscount = subtotal + markupAmt + mobAmount;
+    const beforeHST = Math.max(0, beforeDiscount - discountAmount);
+    const hst = beforeHST * 0.13;
+    const grand = beforeHST + hst;
+
+    let html = `<div style="margin-bottom:16px; font-size:12px; color:var(--muted); letter-spacing:1px; text-transform:uppercase;">Internal Quote Preview · ${new Date().toLocaleDateString('en-CA')}</div>`;
+
+    items.forEach(item => {
+      html += `<div class="quote-line">
+        <span>${item.name} <span style="color:var(--muted); font-size:12px;">(${item.qty} × $${item.rate})</span></span>
+        <span style="font-family:'Barlow Condensed',sans-serif; font-weight:700;">$${item.total.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+      </div>`;
+    });
+
+    if (mobAmount > 0) {
+      html += `<div class="quote-line">
+        <span>Mobilization</span>
+        <span style="font-family:'Barlow Condensed',sans-serif; font-weight:700;">$${mobAmount.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+      </div>`;
+    }
+
+    if (markup > 0) {
+      html += `<div class="quote-line">
+        <span>Site Complexity (${markup}%)</span>
+        <span style="font-family:'Barlow Condensed',sans-serif; font-weight:700;">$${markupAmt.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+      </div>`;
+    }
+
+    if (discountAmount > 0) {
+      html += `<div class="quote-line" style="color:#4caf72;">
+        <span>${discountLabel}</span>
+        <span style="font-family:'Barlow Condensed',sans-serif; font-weight:700;">−$${discountAmount.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+      </div>`;
+    }
+
+    html += `<div class="quote-total-box">
+      <div class="quote-line" style="border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:8px;">
+        <span style="color:var(--muted); font-size:13px;">Subtotal before tax</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;">$${beforeHST.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+      </div>
+      <div class="quote-line" style="border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:8px;">
+        <span style="color:var(--muted); font-size:13px;">HST 13% — #762197218RT0001</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;">$${hst.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+      </div>
+      <div class="quote-grand">
+        <span>TOTAL (CAD)</span>
+        <span>$${grand.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+      </div>
+    </div>
+    <div style="margin-top:16px; font-size:11px; color:var(--muted); line-height:1.6;">
+      ⚠ Internal use only. Do not share this document externally.<br>
+      Client proposals use tiered ICP™ pricing tables.
+    </div>`;
+
+    document.getElementById('quoteBody').innerHTML = html;
+    document.getElementById('quoteModal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('quoteModal').classList.remove('open');
+  }
+
+  document.getElementById('quoteModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // --- Clear all ---
+  function clearAll() {
+    document.querySelectorAll('.rate-input, .qty-input').forEach(i => {
+      i.value = '';
+      i.classList.remove('has-value');
+    });
+    document.querySelectorAll('.line-total').forEach(el => {
+      el.textContent = '—';
+      el.classList.remove('has-value');
+    });
+    document.getElementById('markupInput').value = '0';
+    document.getElementById('mobSelect').value = '0';
+    document.getElementById('mobRateInput').value = '0';
+    document.getElementById('mobRateRow').style.display = 'none';
+    updateTotals();
+  }
+
+  // --- Mob select ---
+  document.getElementById('mobSelect').addEventListener('change', function() {
+    document.getElementById('mobRateRow').style.display = this.value !== '0' ? 'flex' : 'none';
+    updateTotals();
+  });
+</script>
+</body>
+</html>
